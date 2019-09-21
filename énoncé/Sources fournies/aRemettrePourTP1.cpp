@@ -3,6 +3,11 @@
 //
 
 #include "DonneesGTFS.h"
+#include <fstream>
+#include <exception>
+#include <sstream>
+#include <vector>
+#include <string>
 
 using namespace std;
 
@@ -12,6 +17,33 @@ using namespace std;
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
 {
+    string s;
+    vector<string> vec;
+//    const char *sauce;
+//    sauce = ",";
+//    cout << int(*sauce) << endl;
+//    throw exception();
+    stringstream ss;
+    ifstream ifs;
+    ifs.open("../" + p_nomFichier);
+    while (!ifs.eof())
+    {
+        getline(ifs, s);
+        for(char c : s + ","){
+            if (int(c) == 44){
+                vec.push_back(ss.str());
+                cout << ss.str() << endl;
+                cin >> c;
+                ss.str(string());
+            } else ss << c;
+        }
+        for (string lol : vec){
+            cout >> lol >> endl;
+        }
+        //cout << s << endl;
+
+    }
+    ifs.close();
 
 //écrire votre code ici
 
