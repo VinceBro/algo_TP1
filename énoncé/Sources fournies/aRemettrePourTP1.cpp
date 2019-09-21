@@ -7,6 +7,7 @@
 #include <exception>
 #include <sstream>
 #include <vector>
+//#include "ligne.h"
 #include <string>
 
 using namespace std;
@@ -25,22 +26,34 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
 //    throw exception();
     stringstream ss;
     ifstream ifs;
+    // TEMP SECTION
+    char temp;
+    int tempint;
     ifs.open("../" + p_nomFichier);
     while (!ifs.eof())
     {
+        ifs.ignore();
+        tempint = 0;
         getline(ifs, s);
         for(char c : s + ","){
             if (int(c) == 44){
                 vec.push_back(ss.str());
-                cout << ss.str() << endl;
-                cin >> c;
+//                cout << ss.str() << endl;
                 ss.str(string());
             } else ss << c;
         }
+        cout << "p_id : " << vec[0] << "p_numero : " <<  vec[2] << "p_description : " << vec[4] << "p_categorie : " << vec[5] <<  endl;
+        Ligne l(stoul(vec[0]), string(vec[2]), string(vec[4]), static_cast<CategorieBus >(stoi(vec[5])));
+        cout << l << endl;
+        throw exception();
         for (string lol : vec){
-            cout >> lol >> endl;
+
+
+            cout << tempint << "for : " << lol <<  endl;
+            tempint++;
         }
-        //cout << s << endl;
+        vec.clear();
+        cin >> temp;
 
     }
     ifs.close();
