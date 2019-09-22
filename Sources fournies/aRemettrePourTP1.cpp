@@ -1,6 +1,10 @@
 //
 // Created by Mario Marchand on 16-12-29.
 //
+//    const char *sauce;
+//    sauce = ",";
+//    cout << int(*sauce) << endl;
+//    throw exception();
 
 #include "DonneesGTFS.h"
 #include <fstream>
@@ -21,51 +25,29 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
     unsigned int counter = 0;
     string s;
     vector<string> vec;
-//    const char *sauce;
-//    sauce = ",";
-//    cout << int(*sauce) << endl;
-//    throw exception();
     stringstream ss;
     ifstream ifs;
-    // TEMP SECTION
-    char temp;
-    int tempint;
     ifs.open("../" + p_nomFichier);
-    while (!ifs.eof())
+    while (getline(ifs, s))
     {
         if (counter == 0) {
             counter++;
-            getline(ifs, s);
             continue;
         }
-        tempint = 0;
-        getline(ifs, s);
         for(char c : s + ","){
             if (int(c) == 44){
                 vec.push_back(ss.str());
-//                cout << ss.str() << endl;
                 ss.str(string());
             } else ss << c;
         }
-        cout << "p_id : " << vec[0] << "p_numero : " <<  vec[2] << "p_description : " << vec[4] << "p_categorie : " << vec[5] <<  endl;
         Ligne l(stoul(vec[0]), string(vec[2]), string(vec[4]), static_cast<CategorieBus >(stoi(vec[5])));
-        cout << "sauce : " << l << endl;
         m_lignes.insert({stoul(vec[0]) , l });
 
-//        for (string lol : vec){
-//
-//
-//            cout << tempint << "for : " << lol <<  endl;
-//            tempint++;
-//        }
         vec.clear();
         counter++;
 
     }
     ifs.close();
-
-//écrire votre code ici
-
 }
 
 //! \brief ajoute les stations dans l'objet GTFS
@@ -73,9 +55,29 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
 {
-
-//écrire votre code ici
-
+    unsigned int counter = 0;
+    vector<string> vec;
+    string s;
+    stringstream ss;
+    ifstream ifs;
+    ifs.open("../" + p_nomFichier);
+    while (getline(ifs, s)){
+        if (counter == 0) {
+            counter++;
+            continue;
+        }
+        for(char c : s + ","){
+            if (int(c) == 44){
+                vec.push_back(ss.str());
+                ss.str(string());
+            } else ss << c;
+        }
+        Station stat(stol(vec[0]), vec[1], vec[2], Coordonnees(stod(vec[3]), stod(vec[4])));
+        cout << stat << endl;
+        m_stations.insert({stoul(vec[0]), stat});
+        vec.clear();
+        counter++;
+    }
 }
 
 //! \brief ajoute les transferts dans l'objet GTFS
@@ -88,8 +90,26 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
 //! \throws logic_error si tous les arrets de la date et de l'intervalle n'ont pas été ajoutés
 void DonneesGTFS::ajouterTransferts(const std::string &p_nomFichier)
 {
+    unsigned int counter = 0;
+    vector<unsigned int> vec;
+    string s;
+    stringstream ss;
+    ifstream ifs;
+    ifs.open("../" + p_nomFichier);
+    while (getline(ifs, s)){
+        if (counter == 0) {
+            counter++;
+            continue;
+        }
+        for(char c : s + ","){
+            if (int(c) == 44){
+                vec.push_back(stoul(ss.str()));
+                ss.str(string());
+            } else ss << c;
+        }
 
-//écrire votre code ici
+    }
+
 
 }
 
