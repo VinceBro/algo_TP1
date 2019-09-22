@@ -18,6 +18,7 @@ using namespace std;
 //! \throws logic_error si un problème survient avec la lecture du fichier
 void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
 {
+    unsigned int counter = 0;
     string s;
     vector<string> vec;
 //    const char *sauce;
@@ -32,7 +33,11 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
     ifs.open("../" + p_nomFichier);
     while (!ifs.eof())
     {
-        ifs.ignore();
+        if (counter == 0) {
+            counter++;
+            getline(ifs, s);
+            continue;
+        }
         tempint = 0;
         getline(ifs, s);
         for(char c : s + ","){
@@ -44,16 +49,17 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
         }
         cout << "p_id : " << vec[0] << "p_numero : " <<  vec[2] << "p_description : " << vec[4] << "p_categorie : " << vec[5] <<  endl;
         Ligne l(stoul(vec[0]), string(vec[2]), string(vec[4]), static_cast<CategorieBus >(stoi(vec[5])));
-        cout << l << endl;
-        throw exception();
-        for (string lol : vec){
+        cout << "sauce : " << l << endl;
+        m_lignes.insert({stoul(vec[0]) , l });
 
-
-            cout << tempint << "for : " << lol <<  endl;
-            tempint++;
-        }
+//        for (string lol : vec){
+//
+//
+//            cout << tempint << "for : " << lol <<  endl;
+//            tempint++;
+//        }
         vec.clear();
-        cin >> temp;
+        counter++;
 
     }
     ifs.close();
