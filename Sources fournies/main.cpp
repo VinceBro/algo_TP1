@@ -33,7 +33,7 @@ int main()
     cout << "Nombre de transferts = " << donnees_rtc.getNbTransferts() << endl;
     cout << "Nombres de voyages = " << donnees_rtc.getNbVoyages() << endl;
     cout << "Nombre d'arrets = " << donnees_rtc.getNbArrets() << endl << endl;
-
+    throw exception();
     donnees_rtc.afficherLignes();
     donnees_rtc.afficherStations();
     donnees_rtc.afficherStationsDeTransfert();

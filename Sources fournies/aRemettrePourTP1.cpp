@@ -161,6 +161,28 @@ void DonneesGTFS::ajouterServices(const std::string &p_nomFichier)
 void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
 {
 
+    unsigned int counter = 0;
+    vector<string> vec;
+    string s;
+    stringstream ss;
+    ifstream ifs;
+    ifs.open("../" + p_nomFichier);
+    if (!ifs) throw logic_error("Impossible d'ouvrir le fichier");
+    while (getline(ifs, s)){
+        if (counter == 0) {
+            counter++;
+            continue;
+        }
+        else vec = string_to_vector(s, *",");
+        for(string c : m_services){
+            if (vec[1] == c){
+                m_voyages.insert({vec[2], Voyage(vec[2], stoul(vec[0]), vec[1], vec[3])});
+            }
+        }
+        vec.clear();
+        counter++;
+    }
+    ifs.close();
 //écrire votre code ici
 
 }
@@ -174,6 +196,23 @@ void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
 void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichier)
 {
 
+    unsigned int counter = 0;
+    vector<string> vec;
+    string s;
+    stringstream ss;
+    ifstream ifs;
+    ifs.open("../" + p_nomFichier);
+    if (!ifs) throw logic_error("Impossible d'ouvrir le fichier");
+    while (getline(ifs, s)){
+        if (counter == 0) {
+            counter++;
+            continue;
+        }
+        else vec = string_to_vector(s, *",");
+        vec.clear();
+        counter++;
+    }
+    ifs.close();
 //écrire votre code ici
 
 }
