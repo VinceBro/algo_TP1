@@ -174,6 +174,8 @@ void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
             continue;
         }
         else vec = string_to_vector(s, *",");
+
+
         for(string c : m_services){
             if (vec[1] == c){
                 m_voyages.insert({vec[2], Voyage(vec[2], stoul(vec[0]), vec[1], vec[3])});
@@ -198,6 +200,8 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
 
     unsigned int counter = 0;
     vector<string> vec;
+    vector<string> v_now1;
+    vector<string> v_now2;
     string s;
     stringstream ss;
     ifstream ifs;
@@ -209,6 +213,19 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
             continue;
         }
         else vec = string_to_vector(s, *",");
+
+        // initialiser les dates pour les comparer avec les deux m_now
+        v_now1 = string_to_vector(vec[1], *":");
+        Heure p_now1(stoul(v_now1[0]), stoul(v_now1[1]), stoul(v_now1[2]));
+        v_now2 = string_to_vector(vec[2], *":");
+        Heure p_now2(stoul(v_now2[0]), stoul(v_now2[1]), stoul(v_now2[2]));
+
+        if (m_voyages.count(vec[0]) and p_now1 >= m_now1 and p_now2 <= m_now2){
+            Arret::Ptr a = make_shared<Arret>(stoul(vec[3]), p_now2, p_now1, stoul(vec[4]), vec[0] );
+            m_voyages[vec[0]].ajouterArret(a);
+            cout << "temp_counter : " << m_nbArrets <<  endl;
+            m_nbArrets++;
+        }
         vec.clear();
         counter++;
     }
