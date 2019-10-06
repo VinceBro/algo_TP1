@@ -17,7 +17,6 @@
 #include <exception>
 #include <sstream>
 #include <vector>
-//#include "ligne.h"
 #include <string>
 
 using namespace std;
@@ -202,6 +201,7 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
     vector<string> vec;
     vector<string> v_now1;
     vector<string> v_now2;
+    set<unsigned int> allstations;
     string s;
     stringstream ss;
     ifstream ifs;
@@ -214,25 +214,63 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
         }
         else vec = string_to_vector(s, *",");
 
-        // initialiser les dates pour les comparer avec les deux m_now
-        v_now1 = string_to_vector(vec[1], *":");
-        Heure p_now1(stoul(v_now1[0]), stoul(v_now1[1]), stoul(v_now1[2]));
-        v_now2 = string_to_vector(vec[2], *":");
-        Heure p_now2(stoul(v_now2[0]), stoul(v_now2[1]), stoul(v_now2[2]));
+        if (m_voyages.count(vec[0]) ) {
+            // initialiser les dates pour les comparer avec les deux m_now
+            v_now1 = string_to_vector(vec[1], *":");
+            Heure p_now1(stoul(v_now1[0]), stoul(v_now1[1]), stoul(v_now1[2]));
+            v_now2 = string_to_vector(vec[2], *":");
+            Heure p_now2(stoul(v_now2[0]), stoul(v_now2[1]), stoul(v_now2[2]));
 
-        if (m_voyages.count(vec[0]) and p_now1 >= m_now1 and p_now2 <= m_now2){
-            Arret::Ptr a = make_shared<Arret>(stoul(vec[3]), p_now2, p_now1, stoul(vec[4]), vec[0] );
-            m_voyages[vec[0]].ajouterArret(a);
-            cout << "temp_counter : " << m_nbArrets <<  endl;
-            m_nbArrets++;
+            if (p_now1 > m_now1 and p_now2 <= m_now2 and m_stations.count(stoul(vec[3]))) {
+
+//                if (m_stations.count(stoul(vec[3]))) throw exception();
+                Arret::Ptr a = make_shared<Arret>(stoul(vec[3]), p_now2, p_now1, stoul(vec[4]), vec[0]);
+                m_voyages[vec[0]].ajouterArret(a);
+                allstations.insert(stoul(vec[3]));
+                cout << "jpense celle la cest la mauvaise  " << stoul(vec[3]) << endl;
+                m_nbArrets++;
+            }
         }
         vec.clear();
         counter++;
     }
     ifs.close();
+
+    std::map<std::string, Voyage> voyages_copie(m_voyages);
+    vector<unsigned int> allstations2;
+    for (auto v : voyages_copie){
+            for (auto a : v.second.getArrets()){
+                unsigned int stationArret = a.get()->getStationId();
+                cout << stationArret << " cest la station" << endl;
+                allstations2.push_back(stationArret);
+            }
+//        for (auto s: stations_copie){
+//            if (binary_search(allstations2.begin(), allstations2.end(), s.first)) {
+//
+//                cout << "were in boys" << endl;
+//                m_stations.erase(s.first);
+//            }
+//        }
+//        for (auto s: stations_copie){
+//            if (binary_search(allstations.begin(), allstations.end(), s.first)) m_stations.erase(s.first);
+//        }
+        if (v.second.getNbArrets() == 0){
+//            cout << v.second.getStationId() << endl;
+            m_voyages.erase(v.first);
+        }
+    }
+        for (auto id : allstations){
+            if (!binary_search(allstations2.begin(), allstations2.end(), id)) {
+
+                cout << "were in boys" << endl;
+                m_stations.erase(id);
+            }
+        }
+        cout << allstations.size() << endl;
 //écrire votre code ici
 
 }
+
 
 
 
