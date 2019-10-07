@@ -221,12 +221,10 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
             v_now2 = string_to_vector(vec[2], *":");
             Heure p_now2(stoul(v_now2[0]), stoul(v_now2[1]), stoul(v_now2[2]));
 
-            if (p_now1 > m_now1 and p_now2 <= m_now2 and m_stations.count(stoul(vec[3]))) {
-
-//                if (m_stations.count(stoul(vec[3]))) throw exception();
+            if (p_now1 >= m_now1 and p_now2 <  m_now2) {
                 Arret::Ptr a = make_shared<Arret>(stoul(vec[3]), p_now2, p_now1, stoul(vec[4]), vec[0]);
                 m_voyages[vec[0]].ajouterArret(a);
-                allstations.insert(stoul(vec[3]));
+                m_stations[stoul(vec[3])].addArret(a);
                 cout << "jpense celle la cest la mauvaise  " << stoul(vec[3]) << endl;
                 m_nbArrets++;
             }
@@ -237,36 +235,19 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
     ifs.close();
 
     std::map<std::string, Voyage> voyages_copie(m_voyages);
-    vector<unsigned int> allstations2;
-    for (auto v : voyages_copie){
-            for (auto a : v.second.getArrets()){
-                unsigned int stationArret = a.get()->getStationId();
-                cout << stationArret << " cest la station" << endl;
-                allstations2.push_back(stationArret);
-            }
-//        for (auto s: stations_copie){
-//            if (binary_search(allstations2.begin(), allstations2.end(), s.first)) {
-//
-//                cout << "were in boys" << endl;
-//                m_stations.erase(s.first);
-//            }
-//        }
-//        for (auto s: stations_copie){
-//            if (binary_search(allstations.begin(), allstations.end(), s.first)) m_stations.erase(s.first);
-//        }
-        if (v.second.getNbArrets() == 0){
+    for (auto un_voyage : voyages_copie){
+        if (un_voyage.second.getNbArrets() == 0){
 //            cout << v.second.getStationId() << endl;
-            m_voyages.erase(v.first);
+            m_voyages.erase(un_voyage.first);
         }
     }
-        for (auto id : allstations){
-            if (!binary_search(allstations2.begin(), allstations2.end(), id)) {
 
-                cout << "were in boys" << endl;
-                m_stations.erase(id);
-            }
+    std::map<unsigned int, Station> stations_copie(m_stations);
+    for (auto une_station :stations_copie){
+        if (une_station.second.getNbArrets() == 0){
+            m_stations.erase(une_station.first);
         }
-        cout << allstations.size() << endl;
+    }
 //écrire votre code ici
 
 }
