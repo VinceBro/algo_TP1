@@ -48,8 +48,10 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
         else if (vec[7] == "E04503") categoriebus = 2;
         else if (vec[7] == "1A171B" or vec[7] == "003888") categoriebus = 3;
         else throw exception();
+//        Arret::Ptr a = make_shared<Arret>(stoul(vec[3]), p_now2, p_now1, stoul(vec[4]), vec[0]);
         Ligne l(stoi(vec[0]), string(vec[2]), string(vec[4]), static_cast<CategorieBus >(categoriebus));
         m_lignes.insert({stoi(vec[0]) , l });
+        m_lignes_par_numero.insert({vec[4] , l });
 
         vec.clear();
         counter++;
