@@ -43,15 +43,18 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
             continue;
         }
         else vec = string_to_vector(s, *",");
-        if (vec[7] == "97BF0D") categoriebus = 0;
-        else if (vec[7] == "013888") categoriebus = 1;
-        else if (vec[7] == "E04503") categoriebus = 2;
-        else if (vec[7] == "1A171B" or vec[7] == "003888") categoriebus = 3;
-        else throw exception();
-//        Arret::Ptr a = make_shared<Arret>(stoul(vec[3]), p_now2, p_now1, stoul(vec[4]), vec[0]);
-        Ligne l(stoi(vec[0]), string(vec[2]), string(vec[4]), static_cast<CategorieBus >(categoriebus));
-        m_lignes.insert({stoi(vec[0]) , l });
-        m_lignes_par_numero.insert({vec[4] , l });
+
+        string short_name = vec[2];
+        short_name.erase(0, 1);
+        short_name.erase(short_name.size() - 1);
+
+        string description = vec[4];
+        description.erase(0, 1);
+        description.erase(description.size() - 1);
+
+        Ligne l(stoi(vec[0]), short_name, description,Ligne::couleurToCategorie(vec[7]) );
+        m_lignes.insert({stoi(vec[0]), l});
+        m_lignes_par_numero.insert({short_name, l});
 
         vec.clear();
         counter++;
@@ -76,9 +79,17 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
         if (counter == 0) {
             counter++;
             continue;
-        }
-        else vec = string_to_vector(s, *",");
-        Station stat(stoi(vec[0]), vec[1], vec[2], Coordonnees(stod(vec[3]), stod(vec[4])));
+        }else vec = string_to_vector(s, *",");
+
+        string description = vec[2];
+        description.erase(0, 1);
+        description.erase(description.size() - 1);
+
+        string short_name = vec[1];
+        short_name.erase(0, 1);
+        short_name.erase(short_name.size() - 1);
+
+        Station stat(stoi(vec[0]), short_name, description, Coordonnees(stod(vec[3]), stod(vec[4])));
         m_stations.insert({stoul(vec[0]), stat});
         vec.clear();
         counter++;
@@ -111,9 +122,14 @@ void DonneesGTFS::ajouterTransferts(const std::string &p_nomFichier)
         } else vec = string_to_vector(s, *",");
         if (m_stations.count(stoi(vec[0])) and m_stations.count(stoi(vec[1]))){
 //            m_transferts.insert(make_tuple(vec[0], vec[1], vec[3]));
-            auto t = make_tuple(stoi(vec[0]), stoi(vec[1]), stoi(vec[3]));
+            unsigned int transfer_time = stoi(vec[3]);
+
+            //Un temps de transfert est impossible, minimum une seconde
+            if (transfer_time == 0) transfer_time = 1;
+            auto t = make_tuple(stoi(vec[0]), stoi(vec[1]), transfer_time);
 
             m_transferts.push_back(t);
+            m_stationsDeTransfert.insert(stoi(vec[0]));
 
         }
         }
@@ -179,7 +195,10 @@ void DonneesGTFS::ajouterVoyagesDeLaDate(const std::string &p_nomFichier)
 
         for(string c : m_services){
             if (vec[1] == c){
-                m_voyages.insert({vec[2], Voyage(vec[2], stoul(vec[0]), vec[1], vec[3])});
+                string headsign = vec[3];
+                headsign.erase(0, 1);
+                headsign.erase(headsign.size() - 1);
+                m_voyages.insert({vec[2], Voyage(vec[2], stoul(vec[0]), vec[1], headsign)});
             }
         }
         vec.clear();
