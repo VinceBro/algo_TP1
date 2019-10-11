@@ -18,6 +18,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <tuple>
 
 using namespace std;
 
@@ -47,8 +48,8 @@ void DonneesGTFS::ajouterLignes(const std::string &p_nomFichier)
         else if (vec[7] == "E04503") categoriebus = 2;
         else if (vec[7] == "1A171B" or vec[7] == "003888") categoriebus = 3;
         else throw exception();
-        Ligne l(stoul(vec[0]), string(vec[2]), string(vec[4]), static_cast<CategorieBus >(categoriebus));
-        m_lignes.insert({stoul(vec[0]) , l });
+        Ligne l(stoi(vec[0]), string(vec[2]), string(vec[4]), static_cast<CategorieBus >(categoriebus));
+        m_lignes.insert({stoi(vec[0]) , l });
 
         vec.clear();
         counter++;
@@ -75,7 +76,7 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
             continue;
         }
         else vec = string_to_vector(s, *",");
-        Station stat(stol(vec[0]), vec[1], vec[2], Coordonnees(stod(vec[3]), stod(vec[4])));
+        Station stat(stoi(vec[0]), vec[1], vec[2], Coordonnees(stod(vec[3]), stod(vec[4])));
         m_stations.insert({stoul(vec[0]), stat});
         vec.clear();
         counter++;
@@ -93,28 +94,27 @@ void DonneesGTFS::ajouterStations(const std::string &p_nomFichier)
 //! \throws logic_error si tous les arrets de la date et de l'intervalle n'ont pas été ajoutés
 void DonneesGTFS::ajouterTransferts(const std::string &p_nomFichier)
 {
-    // à rajouter en dernier
-//    unsigned int counter = 0;
-//    vector<unsigned int> vec;
-//    string s;
-//    stringstream ss;
-//    ifstream ifs;
-//    ifs.open("../" + p_nomFichier);
-//    if (!ifs) throw logic_error("Impossible d'ouvrir le fichier");
-//    while (getline(ifs, s)){
-//        if (counter == 0) {
-//            counter++;
-//            continue;
-//        }
-//        for(char c : s + ","){
-//            if (int(c) == 44){
-//                vec.push_back(stoul(ss.str()));
-//                ss.str(string());
-//            } else ss << c;
-//        }
-//
-//    }
+    unsigned int counter = 0;
+    unsigned int counter2 = 0;
+    vector<string> vec;
+    string s;
+    stringstream ss;
+    ifstream ifs;
+    ifs.open("../" + p_nomFichier);
+    if (!ifs) throw logic_error("Impossible d'ouvrir le fichier");
+    while (getline(ifs, s)){
+        if (counter == 0) {
+            counter++;
+            continue;
+        } else vec = string_to_vector(s, *",");
+        if (m_stations.count(stoi(vec[0])) and m_stations.count(stoi(vec[1]))){
+//            m_transferts.insert(make_tuple(vec[0], vec[1], vec[3]));
+            auto t = make_tuple(stoi(vec[0]), stoi(vec[1]), stoi(vec[3]));
 
+            m_transferts.push_back(t);
+
+        }
+        }
 
 }
 
@@ -225,7 +225,6 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
                 Arret::Ptr a = make_shared<Arret>(stoul(vec[3]), p_now2, p_now1, stoul(vec[4]), vec[0]);
                 m_voyages[vec[0]].ajouterArret(a);
                 m_stations[stoul(vec[3])].addArret(a);
-                cout << "jpense celle la cest la mauvaise  " << stoul(vec[3]) << endl;
                 m_nbArrets++;
             }
         }
@@ -237,7 +236,6 @@ void DonneesGTFS::ajouterArretsDesVoyagesDeLaDate(const std::string &p_nomFichie
     std::map<std::string, Voyage> voyages_copie(m_voyages);
     for (auto un_voyage : voyages_copie){
         if (un_voyage.second.getNbArrets() == 0){
-//            cout << v.second.getStationId() << endl;
             m_voyages.erase(un_voyage.first);
         }
     }
