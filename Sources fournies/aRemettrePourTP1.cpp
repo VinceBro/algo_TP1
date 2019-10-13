@@ -107,6 +107,7 @@ void DonneesGTFS::ajouterTransferts(const std::string &p_nomFichier)
     ifstream ifs;
     ifs.open("../" + p_nomFichier);
     if (!ifs) throw logic_error("Impossible d'ouvrir le fichier");
+    if (m_voyages.begin()->second.getNbArrets() == 0) throw logic_error("les arrets de la date et de l'intervalle n'ont pas été ajoutés");
     while (getline(ifs, s)){
         if (counter == 0) {
             counter++;
